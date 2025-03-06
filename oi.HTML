@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texto para Fala com Barra Móvel</title>
+    <style>
+        p {
+            font-size: 20px;
+            margin: 20px;
+            position: relative;
+        }
+        span {
+            cursor: pointer; /* Adicionando cursor para indicar que é interativo */
+            position: relative;
+        }
+        .barra {
+            position: absolute;
+            width: 100px;
+            height: 5px;
+            background-color: red;
+            top: 40px;
+            transition: left 0.01s linear;
+        }
+    </style>
+</head>
+<body>
+
+    <p id="texto">Passe a barra sobre as palavras: 
+        <span id="oi">Oi pessoal tudo bem com voces</span> 
+        <span id="pessoal">pessoal</span> 
+        <span id="bem">bem</span>
+        <span id="voces">vocês</span>
+    </p>
+    <div class="barra" id="barra"></div>
+
+    <script>
+        // Função que vai transformar o texto em fala
+        function falarTexto(texto) {
+            const synth = window.speechSynthesis;
+            const utterance = new SpeechSynthesisUtterance(texto);
+            synth.speak(utterance);
+        }
+
+        // Selecionando os elementos de "Oi", "pessoal", "bem" e "vocês"
+        const oiElement = document.getElementById("oi");
+        const pessoalElement = document.getElementById("pessoal");
+        const bemElement = document.getElementById("bem");
+        const vocesElement = document.getElementById("voces");
+        const barraElement = document.getElementById("barra");
+
+        let barraPos = 0;  // Posição inicial da barra
+        const speed = 1;   // Velocidade da barra (ajustada para ser mais suave)
+
+        // Variáveis de controle para garantir que a palavra seja dita apenas uma vez
+        let oiFalada = false;
+        let pessoalFalada = false;
+        let bemFalada = false;
+        let vocesFalada = false;
+
+        // Função para mover a barra
+        function moverBarra() {
+            barraPos += speed;
+            if (barraPos > window.innerWidth) {
+                barraPos = -100; // Resetar posição da barra quando ela sair da tela
+            }
+            barraElement.style.left = barraPos + "px"; // Atualiza a posição da barra
+
+            // Detectando se a barra está sobre a palavra "Oi"
+            const oiRect = oiElement.getBoundingClientRect();
+            if (barraPos + 100 > oiRect.left && barraPos < oiRect.right && !oiFalada) {
+                falarTexto("Oi pessoal tudo bem com voces");
+                oiFalada = true;  // Marca que "Oi" já foi falada
+            }
+
+            // Detectando se a barra está sobre a palavra "pessoal"
+            const pessoalRect = pessoalElement.getBoundingClientRect();
+            if (barraPos + 100 > pessoalRect.left && barraPos < pessoalRect.right && !pessoalFalada) {
+                falarTexto("pessoal");
+                pessoalFalada = true;  // Marca que "pessoal" já foi falada
+            }
+
+            // Detectando se a barra está sobre a palavra "bem"
+            const bemRect = bemElement.getBoundingClientRect();
+            if (barraPos + 100 > bemRect.left && barraPos < bemRect.right && !bemFalada) {
+                falarTexto("bem");
+                bemFalada = true;  // Marca que "bem" já foi falada
+            }
+
+            // Detectando se a barra está sobre a palavra "vocês"
+            const vocesRect = vocesElement.getBoundingClientRect();
+            if (barraPos + 100 > vocesRect.left && barraPos < vocesRect.right && !vocesFalada) {
+                falarTexto("vocês");
+                vocesFalada = true;  // Marca que "vocês" já foi falada
+            }
+
+            // Continuar movendo a barra com uma atualização mais suave
+            requestAnimationFrame(moverBarra);
+        }
+
+        // Inicia o movimento da barra
+        moverBarra();
+    </script>
+
+</body>
+</html>
